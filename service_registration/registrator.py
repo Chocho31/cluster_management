@@ -45,9 +45,10 @@ class Registrator:
         cont_id = container.id
         labels = container.labels
         status = container.status
+        print(labels)
 
-        node_id = labels["com.docker.swarm.node.id"]
-        service = labels["com.docker.swarm.service.name"]
+        node_id = labels.get("com.docker.swarm.node.id", None)
+        service = labels.get("com.docker.swarm.service.name", None)
         ip_addr = self.docker_client.get_container_IP(cont_id, network)
         port = self.docker_client.get_container_exposed_port(cont_id)
 

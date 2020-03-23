@@ -32,8 +32,12 @@ class DockerSDKClient:
     def get_container_exposed_port(self, container):
         cont = self.get_container(container)
         attrs = cont.attrs
-        port_with_protocol = list(attrs['Config']['ExposedPorts'].keys())[0]
-        return int(port_with_protocol[:-4])
+        exposed_ports = attrs['Config'].get('ExposedPorts', None)
+        if exposed_ports:
+            port_with_protocol = list(attrs['Config']['ExposedPorts'].keys())[0]
+            return int(port_with_protocol[:-4])
+
+        return None
 
     def get_container_stats(self, container):
         return self.get_container(container).stats(stream=False)
