@@ -1,6 +1,8 @@
-from errors import CheckAlreadyExistsException, UnknownCheckTypeException, CheckConfigurationException, HealthCheckException
-from utils import parse_env, parse_period
 from datetime import datetime
+from utils import parse_env, parse_period
+from errors import CheckAlreadyExistsException, UnknownCheckTypeException,
+					CheckConfigurationException, HealthCheckException
+
 
 class HealthMonitor:
 	def __init__(self, docker_client, registry_client, scheduler, network):
@@ -27,7 +29,10 @@ class HealthMonitor:
 			if event["Type"] == "container":
 				if event["status"] == "start":
 					container = self.docker_client.get_container(event["id"])
-					self.create_periodic_check(container)
+					try:
+						self.create_periodic_check(container)
+					except CheckConfigurationException:
+						continue
 
 				elif event["status"] == "stop":
 					self.remove_periodic_check(event["id"])
