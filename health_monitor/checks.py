@@ -1,12 +1,15 @@
 import requests
 import socket
 from errors import HttpCheckFailedException, TCPCheckFailedException, HttpConnectionException, TCPConnectionExcpetion, HttpTimeoutException, TCPTimeoutException
+from utils import parse_period
 
-def http_check(ip, port, endpoint, status_code=200, timeout=0, headers={}):
-	url = "http://" + ip + ":" + port + endpoint
+def http_check(ip, port, endpoint, status_code=200, timeout='5s', headers={}):
+	url = "http://" + ip + ":" + str(port) + endpoint
+	timeout_seconds = parse_period(timeout)
 
 	try:
-		r = requests.get(url, timeout=timeout, headers=headers)
+		r = requests.get(url, timeout=timeout_seconds, headers=headers)
+		print(r.status_code)
 
 	except requests.exceptions.ConnectionError:
 		raise HttpConnectionException(url)
