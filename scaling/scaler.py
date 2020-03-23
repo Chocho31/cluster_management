@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from errors import EmptyResultSetException
 
 
 class Scaler:
@@ -42,8 +43,12 @@ class Scaler:
         # scale up if heavily loaded, scale down if load is low
 
         for metric in metrics:
-            metric_value = self.metrics_aggregator.get_service_metric(
-                metric['name'], service)
+            try:
+                metric_value = self.metrics_aggregator.get_service_metric(
+                    metric['name'], service)
+            except EmptyResultSetException:
+                print("Metric value is empty")
+                continue
             
             scale_up_threshold = metric['threshold']['scale_up']
             scale_down_threshold = metric['threshold']['scale_down']

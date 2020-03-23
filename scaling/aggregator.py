@@ -1,5 +1,6 @@
 from influxdb import InfluxDBClient
 from datetime import datetime, timedelta
+from errors import EmptyResultSetException
 
 
 class InfluxAggregator:
@@ -46,7 +47,12 @@ class InfluxAggregator:
         print(result)
 
         gen = result.get_points(measurement='cpu_usage')
-        return next(gen)['mean']
+        try:
+            value = next(gen)['mean']
+        except StopIteration:
+            raise EmptyResultSetException
+
+        return value
 
     def get_service_memory(self, service, period=30):
         date = datetime.now() - timedelta(seconds=period)
@@ -66,7 +72,12 @@ class InfluxAggregator:
             query=query, bind_params=bind_params)
 
         gen = result.get_points(measurement='memory_usage')
-        return next(gen)['mean']
+        try:
+            value = next(gen)['mean']
+        except StopIteration:
+            raise EmptyResultSetException
+
+        return value
 
     def get_container_cpu(self, cont_id, period=30):
         date = datetime.now() - timedelta(seconds=period)
@@ -86,7 +97,12 @@ class InfluxAggregator:
             query=query, bind_params=bind_params)
 
         gen = result.get_points(measurement='cpu_usage')
-        return next(gen)['mean']
+        try:
+            value = next(gen)['mean']
+        except StopIteration:
+            raise EmptyResultSetException
+
+        return value
 
     def get_container_memory(self, cont_id, period=30):
         date = datetime.now() - timedelta(seconds=period)
@@ -106,7 +122,12 @@ class InfluxAggregator:
             query=query, bind_params=bind_params)
 
         gen = result.get_points(measurement='memory_usage')
-        return next(gen)['mean']
+        try:
+            value = next(gen)['mean']
+        except StopIteration:
+            raise EmptyResultSetException
+
+        return value
 
     def get_container_blockio(self, cont_id):
         query = (
@@ -122,8 +143,12 @@ class InfluxAggregator:
             query=query, bind_params=bind_params)
 
         gen = result.get_points(measurement='blockio')
-        bytes = next(gen)
-        return bytes['read_bytes'], bytes['write_bytes']
+        try:
+            value = next(gen)
+        except StopIteration:
+            raise EmptyResultSetException
+
+        return value['read_bytes'], value['write_bytes']
 
     def __del__(self):
         self.db_connection.close()
