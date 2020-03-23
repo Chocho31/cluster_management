@@ -3,9 +3,9 @@ from utils import parse_env, parse_period
 from datetime import datetime
 
 class HealthMonitor:
-	def __init__(self, docker_client, scheduler, network):
+	def __init__(self, docker_client, registry_client, scheduler, network):
 		self.docker_client = docker_client
-		# self.registry_client = registry_client
+		self.registry_client = registry_client
 		self.scheduler = scheduler
 		self.network = network
 		self.checkers = {}
@@ -92,5 +92,5 @@ class HealthMonitor:
 			print("check executed")
 
 		except HealthCheckException:
-			# self.registry_client.deregister(container_id)
+			self.registry_client.deregister(container_id)
 			print("Health Check Exception")
