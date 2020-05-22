@@ -9,34 +9,37 @@ class Registrator:
     def start(self):
         self.sync()
 
-        networks = []
-
         for event in self.docker_client.get_events():
             print("==> event <==")
             print(json.dumps(event, indent=2))
             print("==> end <==")
 
-            if event["Type"] == "network":
-                network = event["Actor"]["Attributes"]["name"]
-
-                if event["Action"] == "connect":
-                    networks.append(network)
-
-                elif event["Action"] == "disconnect":
-                    self.deregister(container, network)
-
             if event["Type"] == "container":
                 if event["status"] == "start":
                     container = self.docker_client.get_container(event["id"])
+                    networks = self.docker_client.get_container_networks(event["id"])
                     
                     for network in networks:
                         self.register(container, network)
 
-                    networks = []
-
                 elif event["status"] == "stop":
                     container = self.docker_client.get_container(event["id"])
                     self.deregister(container)
+
+            elif event["Type"] == "network":
+                if event["Action"] == "connect":
+                    network = event["Actor"]["Attributes"]["name"]
+                    cont_id = event["Actor"]["Attributes"]["container"]
+                    container = self.docker_client.get_container(cont_id)
+
+                    self.register(container, network)
+
+                elif event["Action"] == "disconnect":
+                    network_id = event["Actor"]["ID"]
+                    cont_id = event["Actor"]["Attributes"]["container"]
+                    container = self.docker_client.get_container(cont_id)
+
+                    self.deregister(container, network_id)
 
     def register(self, container, network):
         # write container information in service registry
@@ -58,14 +61,26 @@ class Registrator:
 
         # perform error handling
 
-    def deregister(self, container, network=None):
+    def deregister(self, container, network_id=None):
         # delete container information in service registry
         print(json.dumps(container.attrs, indent=2))
 
-        if network:
-            cont_ip = self.docker_client.get_container_IP(container.id, network)
+        if network_id:
+            registered_ips = self.registry_client.get_container_ips(container.id)
+            cont_ips = self.docker_client.get_container_ips(container.id)
+            print(registered_ips)
+            print(cont_ips)
 
-        self.registry_client.remove(container.id, cont_ip)
+            if len(cont_ips) == 0:
+                self.registry_client.remove(container.id)
+
+            else:
+                for ip in registered_ips:
+                    if ip not in cont_ips:
+                        self.registry_client.remove(container.id, ip)
+
+        else:
+            self.registry_client.remove(container.id)
 
         # perform error handling
 
@@ -78,3 +93,4 @@ class Registrator:
                 
             for network in networks:
                 self.register(container, network)
+

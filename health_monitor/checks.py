@@ -18,7 +18,7 @@ def http_check(ip, port, endpoint, status_code=200, timeout='5s', headers={}):
 		raise HttpTimeoutException(url)
 
 	if r.status_code != status_code:
-		raise HttpCheckFailedException(url, r.status_code)
+		raise HttpCheckFailedException(url, str(r.status_code))
 	
 def tcp_check(ip, port, timeout=0):
 	s = socket.socket(socket.AF_INET)

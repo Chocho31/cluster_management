@@ -18,9 +18,17 @@ class MySQLRegistry:
         return self.db_cursor.fetchall()
 
     def get_service_instances(self, service):
-        query = 'SELECT ip_addr, port FROM Containers WHERE service = %s'
+        query = 'SELECT IP, port FROM Containers WHERE service = %s'
 
         return self.execute_parameterized_query(query, (service,))
+
+    def get_container_ips(self, cont_id):
+        query = 'SELECT IP FROM Containers WHERE containerID = %s'
+
+        result = self.execute_parameterized_query(query, (cont_id,))
+        final = [i[0] for i in result]
+
+        return final
 
     def entry_exists(self, cont_id, ip):
         query = 'SELECT * FROM Containers WHERE containerID = %s AND IP = %s'

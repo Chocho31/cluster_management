@@ -24,6 +24,25 @@ class DockerSDKClient:
     def get_container(self, container):
         return self.client.containers.get(container)
 
+    def get_container_ips(self, container):
+        ips = []
+        cont = self.get_container(container)
+        networks = cont.attrs['NetworkSettings']['Networks']
+
+        for key in networks.keys():
+            cont_ip = networks[key]["IPAddress"]
+
+            if cont_ip != '':
+                ips.append(cont_ip)
+
+        return ips
+
+    def get_container_networks(self, container):
+        cont = self.get_container(container)
+        attrs = cont.attrs
+        networks = attrs['NetworkSettings']['Networks'].keys()
+        return list(networks)
+
     def get_container_IP(self, container, network):
         cont = self.get_container(container)
         attrs = cont.attrs

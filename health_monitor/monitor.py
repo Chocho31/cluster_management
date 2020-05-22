@@ -1,7 +1,6 @@
 from datetime import datetime
 from utils import parse_env, parse_period
-from errors import CheckAlreadyExistsException, UnknownCheckTypeException,
-					CheckConfigurationException, HealthCheckException
+from errors import CheckAlreadyExistsException, UnknownCheckTypeException, CheckConfigurationException, HealthCheckException
 
 
 class HealthMonitor:
@@ -80,7 +79,8 @@ class HealthMonitor:
 
 	def execute_check(self, check_props, container_id):
 		print("executing check with props", check_props, "on container with id", container_id)
-		check_type = check_props.pop('type', None)
+		check_props_copy = dict(check_props)
+		check_type = check_props_copy.pop('type', None)
 
 		if not check_type:
 			raise CheckConfigurationException()
@@ -93,9 +93,9 @@ class HealthMonitor:
 		port = self.docker_client.get_container_exposed_port(container_id)
 
 		try:
-			check_handler(ip, port, **check_props)
+			check_handler(ip, port, **check_props_copy)
 			print("check executed")
 
 		except HealthCheckException:
-			self.registry_client.deregister(container_id)
+			self.registry_client.remove(container_id, ip)
 			print("Health Check Exception")

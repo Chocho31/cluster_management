@@ -43,6 +43,6 @@ class MySQLRegistry:
             query = 'DELETE FROM Containers WHERE containerID = %s'
             self.execute_parameterized_write(query, (cont_id,))
 
-    # def __del__(self):
-    #     if self.db_connection:
-    #         self.db_connection.close()
+    def __del__(self):
+        if self.db_connection:
+            self.db_connection.close()
