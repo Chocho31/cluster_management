@@ -49,7 +49,7 @@ class Scaler:
             except EmptyResultSetException:
                 print("Metric value is empty")
                 continue
-            
+
             scale_up_threshold = metric['threshold']['scale_up']
             scale_down_threshold = metric['threshold']['scale_down']
 

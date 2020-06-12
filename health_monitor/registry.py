@@ -36,9 +36,10 @@ class MySQLRegistry:
             self.execute_parameterized_write(query, values)
 
     def remove(self, cont_id, cont_ip=None):
-        if cont_ip and self.entry_exists(cont_id, cont_ip):
-            query = 'DELETE FROM Containers WHERE containerID = %s and IP = %s'
-            self.execute_parameterized_write(query, (cont_id, cont_ip,))
+        if cont_ip:
+            if self.entry_exists(cont_id, cont_ip):
+                query = 'DELETE FROM Containers WHERE containerID = %s and IP = %s'
+                self.execute_parameterized_write(query, (cont_id, cont_ip,))
         else:
             query = 'DELETE FROM Containers WHERE containerID = %s'
             self.execute_parameterized_write(query, (cont_id,))

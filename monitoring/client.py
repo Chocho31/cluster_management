@@ -24,7 +24,7 @@ class DockerSDKClient:
     def get_container(self, container):
         return self.client.containers.get(container)
 
-    def get_container_IP(self, cxontainer, network):
+    def get_container_IP(self, container, network):
         cont = self.get_container(container)
         attrs = cont.attrs
         return attrs['NetworkSettings']['Networks'][network]['IPAddress']

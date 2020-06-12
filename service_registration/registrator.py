@@ -17,12 +17,13 @@ class Registrator:
             if event["Type"] == "container":
                 if event["status"] == "start":
                     container = self.docker_client.get_container(event["id"])
-                    networks = self.docker_client.get_container_networks(event["id"])
-                    
+                    networks = self.docker_client.get_container_networks(
+                        event["id"])
+
                     for network in networks:
                         self.register(container, network)
 
-                elif event["status"] == "stop":
+                elif event["status"] == "stop" or event["status"] == "kill":
                     container = self.docker_client.get_container(event["id"])
                     self.deregister(container)
 
@@ -66,7 +67,8 @@ class Registrator:
         print(json.dumps(container.attrs, indent=2))
 
         if network_id:
-            registered_ips = self.registry_client.get_container_ips(container.id)
+            registered_ips = self.registry_client.get_container_ips(
+                container.id)
             cont_ips = self.docker_client.get_container_ips(container.id)
             print(registered_ips)
             print(cont_ips)
@@ -90,7 +92,6 @@ class Registrator:
 
         for container in all_containers:
             networks = container.attrs["NetworkSettings"]["Networks"].keys()
-                
+
             for network in networks:
                 self.register(container, network)
-
