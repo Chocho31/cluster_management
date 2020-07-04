@@ -1,3 +1,9 @@
+# config files
+scaling/config.yml
+health_monitor/config.yml
+monitoring/config.yml
+service_registration/config.yml
+
 # pycharm
 .idea/
 
