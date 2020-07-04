@@ -126,15 +126,17 @@
 # config = dict(conf.items('influxDB'))
 # print(config)
 
+# 
+# import docker
+# import json
+# 
+# client = docker.from_env()
+# 
+# container = client.containers.list()[0]
+# container_raw = container.attrs
+# env = container_raw["Config"]["Env"]
+# 
+# 
+# print(env[4])
 
-import docker
-import json
-
-client = docker.from_env()
-
-container = client.containers.list()[0]
-container_raw = container.attrs
-env = container_raw["Config"]["Env"]
-
-
-print(env[4])
+print("test")
